@@ -5,7 +5,7 @@ exports.USERS = [ // kam export const USERS
         surname: 'Valodyan',
         email: 'Valod@mail.ru',
         gender:'male',
-        password: "123",
+        password: "123515151515",
         age: 25,
     },
     {
@@ -90,6 +90,6 @@ exports.USERS = [ // kam export const USERS
         age: 25,
     }
 ];
-
-exports.HOSTNAME = 'localhost';
-exports.PORT = 3000;
+exports.DB = 'mongodb+srv://rkeveyan:Vzgoletsgo2@cluster0.usqklec.mongodb.net/profiles?retryWrites=true&w=majority';
+exports.HOSTNAME = 'localhost'; 
+exports.PORT = 3001;
