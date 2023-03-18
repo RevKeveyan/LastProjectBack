@@ -22,34 +22,11 @@ const postSchema = new Schema({
         type:String,
         require:true,
     },
-},{timestamps: true});
-
-const getSchema = new Schema({
-    id:{
-    type:String,
-        require:true,
-    },
-    firstName:{
-        type:String,
-        require:true,
-    },
-    lastName:{
-        type:String,
-        require:true,
-    },
-    email:{
-        type:String,
-        require:true,
-    },
-    password:{
-        type:String,
-        require:true,
-    },
 });
 
 const models = {
     Users: mongoose.model('Users', postSchema),
-    User: mongoose.model('User', getSchema),
+    // User: mongoose.model('User', getSchema),
     };
 
 module.exports = models;

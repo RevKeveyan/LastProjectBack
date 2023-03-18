@@ -1,7 +1,6 @@
 const { USERS } = require('../constants');
 const models = require('../models/users');
 const Users = models.Users; // signUp
-const User = models.User; // singIn
 
 exports.signUp = (req, res) => {
     const data = req.body;
@@ -33,7 +32,7 @@ exports.signUp = (req, res) => {
   
 exports.signIn = async (req, res) =>{
     const { email, password } = req.body; // hanum enq email password body-ic
-    const user = await User.findOne({ email}).exec(); // gtnum enq  {email:email} nuynna inch vor {email}
+    const user = await Users.findOne({ email}).exec(); // gtnum enq  {email:email} nuynna inch vor {email}
       if (!user) { // ete chaka apa 
             return res.status(401).json({ message: 'Invalid email or password' });
         }
