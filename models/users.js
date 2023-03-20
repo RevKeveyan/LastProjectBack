@@ -24,7 +24,6 @@ const postSchema = new Schema({
     },
 });
 
-exports.models = {
-    Users: mongoose.model('Users', postSchema),
+module.exports = mongoose.model('Users', postSchema);
+// exports.models = Users: mongoose.model('Users', postSchema),
     // User: mongoose.model('User', getSchema),
-    };

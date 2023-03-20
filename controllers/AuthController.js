@@ -1,7 +1,4 @@
-const { USERS } = require('../constants');
-const models = require('../models/users');
-const Users = models.Users; // signUp
-
+const Users = require('../models/users');
 exports.signUp = (req, res) => {
     const data = req.body;
     Users.findOne({ email: data.email }) // gtnum enq user tvyal mailov
