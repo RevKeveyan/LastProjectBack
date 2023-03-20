@@ -32,9 +32,11 @@ exports.signIn = async (req, res) =>{
     const user = await Users.findOne({ email}).exec(); // gtnum enq  {email:email} nuynna inch vor {email}
       if (!user) { // ete chaka apa 
             return res.status(401).json({ message: 'Invalid email or password' });
-        }
+    }
       if (user.password !== password) { // if passwords don't match, return error response
           return res.status(401).json({ message: 'Invalid email or password' });
       }
+
+    
       res.status(200).json(user); 
 };
