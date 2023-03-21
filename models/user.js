@@ -1,14 +1,15 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const postSchema = new Schema({
-    id:{
-        type:String,
-        require:true,
-    },
+const userSchema = new Schema({ 
+
     firstName:{
         type:String,
         require:true,
+    },
+    age:{
+        type:Number,
+        required:true
     },
     lastName:{
         type:String,
@@ -24,6 +25,6 @@ const postSchema = new Schema({
     },
 });
 
-module.exports = mongoose.model('Users', postSchema);
+module.exports = mongoose.model('User', userSchema);
 // exports.models = Users: mongoose.model('Users', postSchema),
     // User: mongoose.model('User', getSchema),

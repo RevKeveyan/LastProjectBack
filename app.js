@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -13,7 +14,7 @@ app.use(cors({
 
 
 
-const {signUp, signIn} = require('./controllers/AuthController');
+const {signUp, signIn, getUser} = require('./controllers/AuthController');
 const { PORT,
         HOSTNAME,
         DB 
@@ -28,6 +29,7 @@ mongoose
 
 app.post('/sign_up', signUp);
 app.post('/sign_in', signIn); // post enq anum vortev petqa menq email u password uxarkenq stugelu hamar
+app.get('/me', getUser);
 
 app.listen(PORT,HOSTNAME, function(err){
     if (err) console.log(err);
