@@ -14,7 +14,7 @@ app.use(cors({
 
 
 
-const {signUp, signIn, getUser} = require('./controllers/AuthController');
+const {signUp, signIn, getUser, updateUser, changePassword} = require('./controllers/AuthController');
 const { PORT,
         HOSTNAME,
         DB 
@@ -23,13 +23,15 @@ const { PORT,
 
 
 mongoose
-    .connect(DB,{useNewUrlParser: true, useUnifiedTopology: true}) // avelacnenq {useNewUrlParser: true, useUnifiedTopology: true} 
+    .connect(DB,{useNewUrlParser: true, useUnifiedTopology: true})
         .then((res)=> console.log('Connetcted to DB'))
         .catch((error)=> console.log(error));
 
 app.post('/sign_up', signUp);
-app.post('/sign_in', signIn); // post enq anum vortev petqa menq email u password uxarkenq stugelu hamar
+app.post('/sign_in', signIn);
 app.get('/me', getUser);
+app.put('/update-user', updateUser);
+app.put('/change-user-password', changePassword);
 
 app.listen(PORT,HOSTNAME, function(err){
     if (err) console.log(err);
