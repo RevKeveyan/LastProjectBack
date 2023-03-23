@@ -12,15 +12,17 @@ app.use(cors({
     origin: '*',
 }));
 
+const {signUp, 
+        signIn, 
+        getUser, 
+        updateUser, 
+        changePassword,
+    } = require('./controllers/AuthController');
 
-
-const {signUp, signIn, getUser, updateUser, changePassword} = require('./controllers/AuthController');
 const { PORT,
         HOSTNAME,
         DB 
         } = require('./constants');
-
-
 
 mongoose
     .connect(DB,{useNewUrlParser: true, useUnifiedTopology: true})

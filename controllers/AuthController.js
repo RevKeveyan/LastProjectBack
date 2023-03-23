@@ -2,12 +2,20 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const {secret} = require('../config/config');
-const { validationResult } = require('express-validator');
+const { check, validationResult } = require('express-validator');
 
 const generateAccessToken = (user) =>{
   const payload = {...user};
   return jwt.sign(payload, secret, {expiresIn: '24h'});
 }
+
+// exports.exporessValidation = ()=>{
+//   return [
+//     check('firstName').not().isEmpty().withMessage('Name must have more than 5 characters'),
+//     check('lastName', 'Last Name must have more than 5 character').not().isEmpty(),
+//     check('age', 'Age must be more then 15').optional(),
+//   ]
+// };
 
 
 exports.signUp = (req, res) => {
@@ -61,9 +69,7 @@ exports.signIn = async (req, res) =>{
         }).catch((error)=>{
           return res.status(401).json({ message: 'Invalid email or password' });
         });
-
-    
-      
+ 
 };
 
 exports.getUser = async (req, res) => {
@@ -94,7 +100,7 @@ exports.updateUser = async (req, res) => {
     try {
       const updatedUser = await user.save();
       const token = generateAccessToken(updatedUser);
-      res.status(200).json(token);
+      res.status(200).json({token,user});
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: 'Error updating user' });
