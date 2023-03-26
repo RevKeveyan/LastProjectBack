@@ -17,23 +17,30 @@ const {signUp,
         getUser, 
         updateUser, 
         changePassword,
+        verifyUser,
     } = require('./controllers/AuthController');
 
 const { PORT,
         HOSTNAME,
         DB 
         } = require('./constants');
+const { createUpdateRequest } = require('./validations/updateUserValidation');
+const { createUserSignUp } = require('./validations/signUpValudation');
+const { createUserSignIn } = require('./validations/signInValidation');
+const { authMiddleware } = require('./middleware/authMiddleware');
 
 mongoose
     .connect(DB,{useNewUrlParser: true, useUnifiedTopology: true})
         .then((res)=> console.log('Connetcted to DB'))
         .catch((error)=> console.log(error));
 
-app.post('/sign_up', signUp);
-app.post('/sign_in', signIn);
+app.post('/sign_up', createUserSignUp, signUp);
+app.post('/sign_in', createUserSignIn,signIn);
 app.get('/me', getUser);
-app.put('/update-user', updateUser);
+app.put('/update-user', authMiddleware, createUpdateRequest, updateUser);
 app.put('/change-user-password', changePassword);
+app.put('/verify/:email' , verifyUser);
+// app.get('/logout', userLogOut);
 
 app.listen(PORT,HOSTNAME, function(err){
     if (err) console.log(err);
