@@ -18,6 +18,7 @@ const {signUp,
         updateUser, 
         changePassword,
         verifyUser,
+        sendCode,
     } = require('./controllers/AuthController');
 
 const { PORT,
@@ -39,7 +40,8 @@ app.post('/sign_in', createUserSignIn,signIn);
 app.get('/me', getUser);
 app.put('/update-user', authMiddleware, createUpdateRequest, updateUser);
 app.put('/change-user-password', changePassword);
-app.put('/verify/:email' , verifyUser);
+app.put('/verify/:data' , verifyUser);
+app.put('/send-verify-code', sendCode);
 // app.get('/logout', userLogOut);
 
 app.listen(PORT,HOSTNAME, function(err){

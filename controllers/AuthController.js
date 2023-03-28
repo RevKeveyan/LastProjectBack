@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const {secret} = require('../config/config');
 const {  validationResult } = require('express-validator');
 const { mailer } = require('../mailer/nodemailer');
+const md5 = require('md5');
 
 const generateAccessToken = (user) =>{
   const payload = {...user};
@@ -21,18 +22,19 @@ exports.signUp = (req, res) => {
       if (user) {
         return res.status(400).json({ message: 'Email already exists' });
       } else {
+        const hashedData = md5(data.email + Date.now());
         const { password } = data;
         const hashPassword = await bcrypt.hashSync(password, 5);
-        const user = new User({ ...data, password: hashPassword });
+        const user = new User({ ...data, password: hashPassword, confirmationCode: hashedData});
         user
           .save()
           .then((result) => {
             const message = {
               from: 'Rev Kev rkeveyan@list.ru',
-              to: 'omer.wisozk@ethereal.email',
+              to: 'vernie76@ethereal.email',
               subject: 'Verify your account',
               html: `<p>Click this link to verify your account</p>
-              <a href="http://localhost:3000/verify/${result.email}"><button>Verify</button></a> `
+              <a href="http://localhost:3000/verify/${hashedData}"><button>Verify</button></a> `
             }
             mailer(message);
             res.status(201).json({ message: 'User created. Verification email sent.' });
@@ -59,6 +61,9 @@ exports.signIn = async (req, res) =>{
         .then(async (user) => {
           if(!user){
             return res.status(401).json({ message: 'Invalid email or password' });
+          }
+          if(!user.isVerified){
+            return res.status(401).json({ message: 'Please verify your account' });
           }
           const validPassword = await bcrypt.compareSync(password, user.password);
           if (validPassword) { 
@@ -109,22 +114,24 @@ exports.updateUser = async (req, res) => {
       res.status(500).json({ message: 'Error updating user' });
     });  
 }
-
 exports.changePassword = async (req, res) => {
   const data = req.body;
+  const { verifyCode } = req.body;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ message: 'Invalid data', errors });
   }
-  User.findOne({ email:data.email}).then(async (user) => {
-    if (!user) {
+  User.findOne({ email: data.email }).then(async (user) => {
+    if(+verifyCode === +user.verifyCode){
+      if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    const validPassword = await bcrypt.compareSync(data.oldPassword, user.password);
-        if (validPassword) { 
-          const hashPassword = await bcrypt.hashSync(data.password,5);
-         user.password = hashPassword;
-          }
+    const validPassword = await bcrypt.compare(data.oldPassword, user.password);
+    if (!validPassword) {
+      return res.status(400).json({ message: 'Incorrect old password' });
+    }
+    const hashPassword = await bcrypt.hash(data.password, 5);
+    user.password = hashPassword;
     try {
       const updatedUser = await user.save();
       const token = generateAccessToken(updatedUser);
@@ -133,22 +140,27 @@ exports.changePassword = async (req, res) => {
       console.error(err);
       res.status(500).json({ message: 'Error updating user' });
     }
-    }).catch((error) => {
-      console.log(error);
-      res.status(500).json({ message: 'Error updating user' });
-    });  
+  }else{
+    res.status(400).json({message: "incorrect code "});
+  }
+    
+  }).catch((error) => {
+    console.log(error);
+    res.status(500).json({ message: 'Error updating user' });
+  });
 };
 
 exports.verifyUser = async (req, res) => {
-  const email = req.params.email;
-  console.log(email);
-  User.findOne({email})
+  const {data} = req.params;
+  console.log(data);
+  User.findOne({confirmationCode:data})
     .then((user) => {
       console.log(user);
       if (user) {
         user.isVerified = true;
+        user.confirmationCode = null;
         user.save();
-        res.status(200).json({ message: 'Account verified successfully' });
+        res.status(200).json({ message: 'Account verified successfully', user});
       } else {
         res.status(404).json({ message: 'User not found' });
       }
@@ -157,4 +169,26 @@ exports.verifyUser = async (req, res) => {
       console.log(error);
       res.status(500).json({ message: 'Error verifying account' });
     });
+};
+
+exports.sendCode = async (req, res) => {
+  const code = Math.floor(Math.random() * 9000) + 1000;
+  const {email} = req.body;
+  User.findOne({email}).then((user)=>{
+      if(!user){
+        res.status(404).json({message: "User not found"});
+      }
+      const message = {
+        from: 'Rev Kev rkeveyan@list.ru',
+        to: 'nakia70@ethereal.email',
+        subject: 'Verify your account',
+        html: `<p>Click this link to verify your account</p>
+        verify code: -- ${code}`,
+      }
+      mailer(message);
+      user.verifyCode = code;
+      user.save();
+  }).catch((err)=>{
+       res.status(400).json({message: "incorrect code "});
+  });
 };

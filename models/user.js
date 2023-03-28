@@ -23,9 +23,18 @@ const userSchema = new Schema({
         type:String,
         require:true,
     },
+    confirmationCode:{
+        type:String,
+    },
     isVerified:{
         type:Boolean,
         require:true,
+        default:false,
+    },
+    verifyCode:{
+        type:Number,
+        require:true,
+        default:null,
     },
 });
 
