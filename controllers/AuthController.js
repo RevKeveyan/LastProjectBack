@@ -31,7 +31,7 @@ exports.signUp = (req, res) => {
           .then((result) => {
             const message = {
               from: 'Rev Kev rkeveyan@list.ru',
-              to: 'vernie76@ethereal.email',
+              to: 'myrtie.simonis@ethereal.email',
               subject: 'Verify your account',
               html: `<p>Click this link to verify your account</p>
               <a href="http://localhost:3000/verify/${hashedData}"><button>Verify</button></a> `
@@ -126,10 +126,10 @@ exports.changePassword = async (req, res) => {
       if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    const validPassword = await bcrypt.compare(data.oldPassword, user.password);
-    if (!validPassword) {
-      return res.status(400).json({ message: 'Incorrect old password' });
-    }
+    // const validPassword = await bcrypt.compare(data.oldPassword, user.password);
+    // if (!validPassword) {
+    //   return res.status(400).json({ message: 'Incorrect old password' });
+    // }
     const hashPassword = await bcrypt.hash(data.password, 5);
     user.password = hashPassword;
     try {
@@ -174,21 +174,29 @@ exports.verifyUser = async (req, res) => {
 exports.sendCode = async (req, res) => {
   const code = Math.floor(Math.random() * 9000) + 1000;
   const {email} = req.body;
-  User.findOne({email}).then((user)=>{
+  console.log(email);
+  User.findOne({email}).then(async (user)=>{
       if(!user){
         res.status(404).json({message: "User not found"});
       }
-      const message = {
-        from: 'Rev Kev rkeveyan@list.ru',
-        to: 'nakia70@ethereal.email',
-        subject: 'Verify your account',
-        html: `<p>Click this link to verify your account</p>
-        verify code: -- ${code}`,
+      const validPassword = await bcrypt.compare(req.body.oldPassword, user.password);
+      if (!validPassword) {
+          return res.status(400).json({ message: 'Incorrect old password' });
+      }else{
+        const message = {
+          from: 'Rev Kev rkeveyan@list.ru',
+          to: 'myrtie.simonis@ethereal.email',
+          subject: 'Verify your account',
+          html: `<p>Click this link to verify your account</p>
+          verify code: -- ${code}`,
+        }
+        mailer(message);
+        user.verifyCode = code;
+        user.save();
       }
-      mailer(message);
-      user.verifyCode = code;
-      user.save();
+      
   }).catch((err)=>{
-       res.status(400).json({message: "incorrect code "});
+    console.log(err);
+       res.status(400).json({message: "User not found"});
   });
 };
