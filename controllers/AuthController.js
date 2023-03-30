@@ -31,7 +31,7 @@ exports.signUp = (req, res) => {
           .then((result) => {
             const message = {
               from: 'Rev Kev rkeveyan@list.ru',
-              to: 'myrtie.simonis@ethereal.email',
+              to: 'parker.steuber26@ethereal.email',
               subject: 'Verify your account',
               html: `<p>Click this link to verify your account</p>
               <a href="http://localhost:3000/verify/${hashedData}"><button>Verify</button></a> `
@@ -185,10 +185,49 @@ exports.sendCode = async (req, res) => {
       }else{
         const message = {
           from: 'Rev Kev rkeveyan@list.ru',
-          to: 'myrtie.simonis@ethereal.email',
+          to: 'parker.steuber26@ethereal.email',
           subject: 'Verify your account',
-          html: `<p>Click this link to verify your account</p>
-          verify code: -- ${code}`,
+          html: `<!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Example Email</title>
+            <style>
+              body {
+                background-color: green;
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position: center center;
+                text-align: center;
+              }
+              td span{
+                border:1px solid red;
+              }
+              table{
+                margin:0 auto;
+              }
+              
+            </style>
+          </head>
+          <body style="font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5;">
+            <table cellpadding="5" cellspacing="10" border="0" width="80s%">
+              <tr>
+                <td align="center" bgcolor="#ffffff" style="padding: 20px;">
+                  
+                </td>
+                <td align="center" bgcolor="#ffffff" style="padding: 20px;">
+                  <h1 style="font-size: 28px; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">Verify password</h1>
+                  <p width="300px" style="margin-bottom: 20px;">Your verify code is -- <span>${code}</span></p>
+                </td>
+                <td align="center" bgcolor="#ffffff" style="padding: 20px;">
+                  
+                </td>
+              </tr>
+            </table>
+          </body>
+          </html>
+          `,
         }
         mailer(message);
         user.verifyCode = code;

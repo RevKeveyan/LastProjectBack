@@ -20,6 +20,12 @@ const {signUp,
         verifyUser,
         sendCode,
     } = require('./controllers/AuthController');
+const {
+        newPost, 
+        getPosts,
+        deletePost,
+        updatePost,
+        } = require('./controllers/PostController');
 
 const { PORT,
         HOSTNAME,
@@ -29,20 +35,30 @@ const { createUpdateRequest } = require('./validations/updateUserValidation');
 const { createUserSignUp } = require('./validations/signUpValudation');
 const { createUserSignIn } = require('./validations/signInValidation');
 const { authMiddleware } = require('./middleware/authMiddleware');
+const { createPost } = require('./validations/postValidation');
 
 mongoose
     .connect(DB,{useNewUrlParser: true, useUnifiedTopology: true})
         .then((res)=> console.log('Connetcted to DB'))
         .catch((error)=> console.log(error));
-
+//---user
 app.post('/sign_up', createUserSignUp, signUp);
 app.post('/sign_in', createUserSignIn,signIn);
-app.get('/me', getUser);
-app.put('/update-user', authMiddleware, createUpdateRequest, updateUser);
-app.put('/change-user-password', changePassword);
+//---
+app.get('/me',authMiddleware, getUser);
+app.put('/update-user', createUpdateRequest, authMiddleware, updateUser);
+app.put('/change-user-password',authMiddleware, changePassword);
+//---
 app.put('/verify/:data' , verifyUser);
 app.put('/send-verify-code', sendCode);
-// app.get('/logout', userLogOut);
+//---
+
+//---posts
+app.get('/user/posts',authMiddleware, getPosts);
+app.post('/user/new-post',authMiddleware,createPost, newPost);
+app.put('/user/update-post',authMiddleware,createPost, updatePost);
+app.delete('/user/delete-post',authMiddleware, deletePost);
+
 
 app.listen(PORT,HOSTNAME, function(err){
     if (err) console.log(err);
