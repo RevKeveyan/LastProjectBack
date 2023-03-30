@@ -1,6 +1,7 @@
 const Post = require('../models/post');
 const {secret} = require('../config/config');
 const jwt = require('jsonwebtoken');
+const { validationResult } = require('express-validator');
 
 exports.getPosts = (req, res) => {
     const token = req.headers.authentication;
@@ -22,6 +23,10 @@ exports.newPost = (req, res) => {
     const decodedData = jwt.verify(token, secret);
     const userId = decodedData._doc._id;
     const data = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ message: 'Invalid data', errors })
+    }
     const post = new Post({...data, userId, createdAt});
 
     post
@@ -38,6 +43,10 @@ exports.updatePost = (req, res) => {
     const {id} = req.body;
     const {title} = req.body;
     const {description} = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ message: 'Invalid data', errors })
+    }
     Post.findOne({_id:id})
     .then((post)=>{
         post.title = title;

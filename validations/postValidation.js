@@ -12,4 +12,4 @@ exports.createPost = [
         .isLength({min: 8})
         .withMessage('Description min length 8 symbol'),
 
-  ];
+  ]; 
