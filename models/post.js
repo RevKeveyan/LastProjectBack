@@ -1,9 +1,17 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema({ 
+const postSchema = new Schema({ 
 
     userId:{
+        type:String,
+        require:true,
+    },
+    userName:{
+        type:String,
+        require:true,
+    },
+    userLastName:{
         type:String,
         require:true,
     },
@@ -15,6 +23,10 @@ const userSchema = new Schema({
         type:String,
         require:true,
     },
+    imageUrl: { 
+        type: String,
+        default:null,
+    },
     createdAt:{
         type:Number,
         require:true,
@@ -23,7 +35,12 @@ const userSchema = new Schema({
         type:Number,
         require:true,
         default:null,
-    }
+    },
+    userImg:{
+        type: String,
+        default:null,
+    },
+    likes: [ String ]
 });
 
-module.exports = mongoose.model('Post', userSchema);
+module.exports = mongoose.model('Post', postSchema);

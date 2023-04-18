@@ -26,6 +26,13 @@ const userSchema = new Schema({
     confirmationCode:{
         type:String,
     },
+    avatarUrl:{
+        type:String,
+    },
+    createdAt:{
+        type:Number,
+        require:true,
+    },
     isVerified:{
         type:Boolean,
         require:true,

@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const {secret} = require('../config/config');
 const {  validationResult } = require('express-validator');
 const { mailer } = require('../mailer/nodemailer');
+const path = require('path');
 const md5 = require('md5');
 
 const generateAccessToken = (user) =>{
@@ -12,26 +13,33 @@ const generateAccessToken = (user) =>{
 }
 
 exports.signUp = (req, res) => {
-  const data = req.body;
-  const errors = validationResult(req);
+ 
+  const {firstName} = req.body;
+  const {lastName} = req.body;
+  const {email} = req.body;
+  const {age} = req.body;
+  const {password} = req.body;
+  const {createdAt} = req.body;
+  const avatar = req.file;
+  const path = avatar.path.slice(6);
+  const errors = validationResult(req.body);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ message: 'Invalid data', errors })
+    return res.status(400).json({ message: 'Invalid data', errors });
   }
-  User.findOne({ email: data.email })
+  User.findOne({ email })
     .then(async(user) => {
       if (user) {
         return res.status(400).json({ message: 'Email already exists' });
       } else {
-        const hashedData = md5(data.email + Date.now());
-        const { password } = data;
+        const hashedData = md5(email + Date.now());
         const hashPassword = await bcrypt.hashSync(password, 5);
-        const user = new User({ ...data, password: hashPassword, confirmationCode: hashedData});
+        const user = new User({ firstName, lastName,age, createdAt, email,avatarUrl:path, password: hashPassword, confirmationCode: hashedData});
         user
           .save()
           .then((result) => {
             const message = {
               from: 'Rev Kev rkeveyan@list.ru',
-              to: 'parker.steuber26@ethereal.email',
+              to: 'elise23@ethereal.email',
               subject: 'Verify your account',
               html: `<p>Click this link to verify your account</p>
               <a href="http://localhost:3000/verify/${hashedData}"><button>Verify</button></a> `
@@ -75,7 +83,30 @@ exports.signIn = async (req, res) =>{
         });
  
 };
+exports.getAllUsers = (req, res) => {
+  const perPage = 5; // Number of results per page
+  const page = parseInt(req.query.page) || 1; // Requested page, defaults to 1 if not specified
 
+  const countPromise = User.countDocuments();
+  const findPromise = User.find({})
+    .skip((perPage * page) - perPage)
+    .limit(perPage)
+    .exec();
+
+  Promise.all([countPromise, findPromise])
+    .then((results) => {
+      const [totalUsers, users] = results;
+      res.status(200).json({
+        users,
+        currentPage: page,
+        pages: Math.ceil(totalUsers / perPage),
+        totalUsers,
+      });
+    })
+    .catch((err) => {
+      res.status(400).json({ message: "Users not found" });
+    });
+};
 exports.getUser = async (req, res) => {
   try {
     const token = req.headers.authentication;
@@ -126,10 +157,6 @@ exports.changePassword = async (req, res) => {
       if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    // const validPassword = await bcrypt.compare(data.oldPassword, user.password);
-    // if (!validPassword) {
-    //   return res.status(400).json({ message: 'Incorrect old password' });
-    // }
     const hashPassword = await bcrypt.hash(data.password, 5);
     user.password = hashPassword;
     try {
@@ -185,7 +212,7 @@ exports.sendCode = async (req, res) => {
       }else{
         const message = {
           from: 'Rev Kev rkeveyan@list.ru',
-          to: 'parker.steuber26@ethereal.email',
+          to: 'elise23@ethereal.email',
           subject: 'Verify your account',
           html: `<!DOCTYPE html>
           <html>

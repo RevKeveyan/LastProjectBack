@@ -6,6 +6,16 @@ exports.createPost = [
         .withMessage('Title is required')
         .isLength({min: 2})
         .withMessage('Title is not valid'),
+    check('userName')
+        .notEmpty()  
+        .withMessage('Title is required')
+        .isLength({min: 2})
+        .withMessage('Title is not valid'),
+    check('userLastName')
+        .notEmpty()  
+        .withMessage('Title is required')
+        .isLength({min: 2})
+        .withMessage('Title is not valid'),
     check('description')
         .notEmpty()  
         .withMessage('Description is required')
